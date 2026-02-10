@@ -1,0 +1,63 @@
+{% extends 'biblioteca/base.html' %}
+
+{% block titulo %}{{ editorial.nombre }}{% endblock %}
+
+{% block contenido %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+                <h1 class="display-5 fw-bold text-success">{{ editorial.nombre }}</h1>
+                <hr>
+                <h5 class="text-muted mb-3">Información</h5>
+                <p class="lead">
+                    <strong>País de origen:</strong> 
+                    {% if editorial.pais %}
+                        {{ editorial.pais }}
+                    {% else %}
+                        <span class="text-muted">Desconocido</span>
+                    {% endif %}
+                </p>
+                
+                <div class="mt-4">
+                    <a href="{% url 'lista_editoriales' %}" class="btn btn-outline-secondary">
+                        <i class="fa-solid fa-arrow-left"></i> Volver
+                    </a>
+                    <a href="{% url 'editar_editorial' editorial.pk %}" class="btn btn-warning">
+                        <i class="fa-solid fa-pen"></i> Editar
+                    </a>
+                    <a href="{% url 'eliminar_editorial' editorial.pk %}" class="btn btn-danger">
+                        <i class="fa-solid fa-trash"></i> Eliminar
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <h3 class="mb-3"><i class="fa-solid fa-book me-2"></i>Catálogo de {{ editorial.nombre }}</h3>
+        
+        <div class="row">
+            {% for libro in editorial.libro_set.all %}
+            <div class="col-md-4 mb-3">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ libro.titulo }}</h5>
+                        <p class="card-text text-muted small">
+                            Autor: {{ libro.autor.nombre }}
+                        </p>
+                        <a href="{% url 'detalle_libro' libro.pk %}" class="btn btn-sm btn-primary w-100">
+                            Ver libro
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-warning">
+                    No hay libros registrados de esta editorial.
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

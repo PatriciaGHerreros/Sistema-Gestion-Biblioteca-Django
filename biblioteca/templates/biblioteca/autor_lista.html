@@ -1,0 +1,63 @@
+{% extends 'biblioteca/base.html' %}
+
+{% block titulo %}Listado de Autores{% endblock %}
+
+{% block contenido %}
+<div class="row mb-4 align-items-center">
+    <div class="col-md-6">
+        <h1 class="display-5 fw-bold">Autores Registrados</h1>
+    </div>
+    <div class="col-md-6 text-md-end">
+        <a href="{% url 'crear_autor' %}" class="btn btn-success">
+            <i class="fa-solid fa-user-plus me-1"></i> Nuevo Autor
+        </a>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped mb-0 align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col" class="ps-4">Nombre</th>
+                        <th scope="col">Biografía (Extracto)</th>
+                        <th scope="col" class="text-end pe-4">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for autor in autores %}
+                    <tr>
+                        <td class="ps-4 fw-bold">{{ autor.nombre }}</td>
+                        <td>
+                            {% if autor.biografia %}
+                                {{ autor.biografia|truncatewords:10 }}
+                            {% else %}
+                                <span class="text-muted fst-italic">Sin biografía</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end pe-4">
+                            <a href="{% url 'detalle_autor' autor.pk %}" class="btn btn-sm btn-outline-primary me-1" title="Ver libros">
+                                <i class="fa-solid fa-eye"></i>
+                            </a>
+                            <a href="{% url 'editar_autor' autor.pk %}" class="btn btn-sm btn-outline-warning me-1" title="Editar">
+                                <i class="fa-solid fa-pen"></i>
+                            </a>
+                             <a href="{% url 'eliminar_autor' autor.pk %}" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                <i class="fa-solid fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="text-center py-4 text-muted">
+                            No hay autores registrados.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,116 @@
+{% load static %} <!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block titulo %}Biblioteca Personal{% endblock %}</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+
+    <style>
+        body { 
+            font-family: 'Lato', sans-serif; 
+            background-color: #f8f9fa; 
+        }
+        h1, h2, h3, .navbar-brand { 
+            font-family: 'Playfair Display', serif; 
+        }
+        
+        /* Navbar con degradado elegante */
+        .navbar {
+            background: linear-gradient(90deg, #2c3e50 0%, #000000 100%) !important;
+            padding: 0.8rem 2rem;
+        }
+
+        /* Sección Hero para la página principal */
+        .hero-section {
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
+                        url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 80px 20px;
+            margin-bottom: 40px;
+            text-align: center;
+            border-radius: 15px;
+        }
+    </style>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand fs-3" href="{% url 'lista_libros' %}">
+                <i class="fa-solid fa-book-open-reader text-warning me-2"></i>
+                <span class="text-white">Biblioteca</span><span class="text-warning">Personal</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'lista_libros' %}">Libros</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'lista_autores' %}">Autores</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'lista_editoriales' %}">Editoriales</a></li>
+                  {# --- SOLO PARA EL ADMIN --- #}
+                        {% if user.is_superuser %}
+                            <li class="nav-item">
+                                <a class="nav-link fw-bold text-warning" href="{% url 'gestion_alquileres' %}">
+                                    <i class="fa-solid fa-clipboard-list me-1"></i> Alquileres
+                                </a>
+                            </li>
+                        {% endif %}
+
+
+                    {% if user.is_authenticated %}
+                        {# 1. Si es usuario normal, ve sus alquileres #}
+                        {% if not user.is_superuser %}
+                            <li class="nav-item">
+                                <a class="nav-link fw-bold text-info" href="{% url 'mis_alquileres' %}">
+                                    <i class="fa-solid fa-bookmark me-1"></i>Mis Alquileres
+                                </a>
+                            </li>
+                        {% endif %}
+                        
+                        {# 2. Botón de Salir para todos los logueados (Admin o Usuario) #}
+                        <li class="nav-item ms-lg-3">
+                            <form action="{% url 'logout' %}" method="post" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="nav-link btn btn-link border-0 text-white-50 p-2">
+                                    <i class="fa-solid fa-right-from-bracket me-1"></i>Salir ({{ user.username }})
+                                </button>
+                            </form>
+                        </li>
+
+                    {% else %}
+                        {# 3. Si no está logueado, ve botones de acceso #}
+                        <li class="nav-item ms-lg-3">
+                            <a class="nav-link btn btn-outline-light btn-sm px-3 mb-1" href="{% url 'login' %}">Entrar</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn btn-primary btn-sm px-3" href="{% url 'registro' %}">Registro</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <main class="container flex-grow-1">
+        {% block contenido %}
+        {% endblock %}
+    </main>
+
+    <footer class="bg-light text-center py-3 mt-4 border-top">
+        <p class="mb-0 text-muted">©Patricia García 2025 Biblioteca Personal - Examen Tema 7</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

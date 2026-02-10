@@ -1,0 +1,39 @@
+{% extends 'biblioteca/base.html' %}
+
+{% block titulo %}Registrar Nuevo Libro{% endblock %}
+
+{% block contenido %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fa-solid fa-book me-2"></i>Registrar Libro</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        {% for campo in formulario %}
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label fw-bold">{{ campo.label }}</label>
+                            {{ campo }}
+                            {% if campo.errors %}
+                                <div class="text-danger small mt-1">{{ campo.errors }}</div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="d-grid gap-2 mt-3">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa-solid fa-save me-1"></i> Guardar Libro
+                        </button>
+                        <a href="{% url 'lista_libros' %}" class="btn btn-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

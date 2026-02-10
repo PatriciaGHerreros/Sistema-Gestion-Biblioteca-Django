@@ -1,0 +1,141 @@
+{% extends 'biblioteca/base.html' %}
+
+{% block titulo %}Listado de Libros{% endblock %}
+
+{% block contenido %}
+<div class="hero-section shadow">
+    <div class="container">
+        <h1 class="display-4 fw-bold italic">Tu Refugio Literario</h1>
+        <p class="lead">Descubre mundos nuevos entre nuestras estanterías virtuales.</p>
+    </div>
+</div>
+<div class="row mb-4 align-items-center">
+    <div class="col-md-6">
+        <h1 class="display-5 fw-bold">Catálogo de Libros</h1>
+    </div>
+    <div class="col-md-6 text-md-end">
+        {# Ajuste: Solo el administrador real puede ver el botón de crear #}
+        {% if user.is_superuser %}
+            <a href="{% url 'crear_libro' %}" class="btn btn-primary">
+                <i class="fa-solid fa-plus me-1"></i> Nuevo Libro
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <form class="d-flex" method="GET">
+            <input class="form-control me-2" type="search" name="q" placeholder="Buscar libro por título..." value="{{ busqueda|default:'' }}" aria-label="Search">
+            <button class="btn btn-outline-dark" type="submit">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+            {% if busqueda %}
+                <a href="{% url 'lista_libros' %}" class="btn btn-outline-danger ms-2">Limpiar</a>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    {% if page_obj %}
+        {% for libro in page_obj %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm border-0">
+                {% if libro.portada %}
+                    <img src="{{ libro.portada.url }}" class="card-img-top" alt="{{ libro.titulo }}" style="height: 250px; object-fit: cover;">
+                {% else %}
+                    <div class="bg-secondary text-white d-flex justify-content-center align-items-center" style="height: 250px;">
+                        <i class="fa-solid fa-book fa-3x"></i>
+                    </div>
+                {% endif %}
+                
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">{{ libro.titulo }}</h5>
+                    <p class="card-text text-muted mb-1">
+                        <small><i class="fa-solid fa-user me-1"></i> {{ libro.autor.nombre }}</small>
+                    </p>
+                    <p class="card-text mb-3">
+                        {{ libro.sinopsis|truncatewords:15 }}
+                    </p>
+
+                    {# --- SECCIÓN DE DISPONIBILIDAD (PÚBLICA) --- #}
+                    <div class="mb-3">
+                        {% if libro.esta_disponible %}
+                            <span class="badge bg-success w-100 p-2">
+                                <i class="fa-solid fa-check me-1"></i> Disponible
+                            </span>
+                        {% else %}
+                            <span class="badge bg-danger w-100 p-2">
+                                <i class="fa-solid fa-clock me-1"></i> Alquilado
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <a href="{% url 'detalle_libro' libro.pk %}" class="btn btn-outline-primary btn-sm w-100 mb-2">Ver detalle</a>
+
+                {# --- SECCIÓN DE ACCIONES (SEGÚN SESIÓN) --- #}
+                {# Solo permitimos alquilar si está logueado Y NO es el superusuario #}
+                {% if user.is_authenticated and not user.is_superuser %}
+                    {% if libro.esta_disponible %}
+                        <a href="{% url 'alquilar_libro' libro.pk %}" class="btn btn-success btn-sm w-100">
+                            <i class="fa-solid fa-key me-1"></i> Alquilar
+                        </a>
+                    {% else %}
+                        <button class="btn btn-secondary btn-sm w-100" disabled>
+                            <i class="fa-solid fa-lock me-1"></i> No disponible
+                        </button>
+                    {% endif %}
+                {% elif not user.is_authenticated %}
+                 {% else %}
+                    <div class="text-center mt-2">
+                        <small class="text-muted d-block mb-1">¿Te interesa este libro?</small>
+                        <a href="{% url 'login' %}" class="btn btn-outline-dark btn-sm">Inicia Sesión</a>
+                        <a href="{% url 'registro' %}" class="btn btn-outline-primary btn-sm">Regístrate</a>
+                    </div>
+                {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                No se encontraron libros {% if busqueda %} para "<strong>{{ busqueda }}</strong>"{% endif %}.
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+{% if page_obj.has_other_pages %}
+<nav aria-label="Navegación de páginas" class="mt-4">
+  <ul class="pagination justify-content-center">
+    {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if busqueda %}&q={{ busqueda }}{% endif %}">
+                &laquo; Anterior
+            </a>
+        </li>
+    {% else %}
+        <li class="page-item disabled"><span class="page-link">&laquo; Anterior</span></li>
+    {% endif %}
+
+    <li class="page-item active">
+        <span class="page-link">
+            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+        </span>
+    </li>
+
+    {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if busqueda %}&q={{ busqueda }}{% endif %}">
+                Siguiente &raquo;
+            </a>
+        </li>
+    {% else %}
+        <li class="page-item disabled"><span class="page-link">Siguiente &raquo;</span></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+{% endblock %}

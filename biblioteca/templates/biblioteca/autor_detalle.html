@@ -1,0 +1,62 @@
+{% extends 'biblioteca/base.html' %}
+
+{% block titulo %}{{ autor.nombre }}{% endblock %}
+
+{% block contenido %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+                <h1 class="display-5 fw-bold text-primary">{{ autor.nombre }}</h1>
+                <hr>
+                <h5 class="text-muted mb-3">Biografía</h5>
+                <p class="lead">
+                    {% if autor.biografia %}
+                        {{ autor.biografia|linebreaks }}
+                    {% else %}
+                        <em class="text-muted">No hay información biográfica disponible.</em>
+                    {% endif %}
+                </p>
+                
+                <div class="mt-4">
+                    <a href="{% url 'lista_autores' %}" class="btn btn-outline-secondary">
+                        <i class="fa-solid fa-arrow-left"></i> Volver al listado
+                    </a>
+                    <a href="{% url 'editar_autor' autor.pk %}" class="btn btn-warning">
+                        <i class="fa-solid fa-pen"></i> Editar Autor
+                    </a>
+                    <a href="{% url 'eliminar_autor' autor.pk %}" class="btn btn-danger">
+                        <i class="fa-solid fa-trash"></i> Eliminar
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <h3 class="mb-3"><i class="fa-solid fa-book me-2"></i>Libros de {{ autor.nombre }}</h3>
+        
+        <div class="row">
+            {% for libro in autor.libro_set.all %}
+            <div class="col-md-4 mb-3">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ libro.titulo }}</h5>
+                        <p class="card-text text-muted small">
+                            <i class="fa-solid fa-calendar-days"></i> {{ libro.fecha_publicacion|date:"Y" }}
+                        </p>
+                        <a href="{% url 'detalle_libro' libro.pk %}" class="btn btn-sm btn-primary w-100">
+                            Ver libro
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-warning">
+                    Este autor aún no tiene libros registrados en la biblioteca.
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

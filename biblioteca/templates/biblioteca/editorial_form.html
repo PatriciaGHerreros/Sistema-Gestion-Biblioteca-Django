@@ -1,0 +1,35 @@
+{% extends 'biblioteca/base.html' %}
+
+{% block titulo %}Registrar Editorial{% endblock %}
+
+{% block contenido %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h4 class="mb-0"><i class="fa-solid fa-building me-2"></i>Registrar Editorial</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    {% for campo in formulario %}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">{{ campo.label }}</label>
+                        {{ campo }}
+                        {% if campo.errors %}
+                            <div class="text-danger small mt-1">{{ campo.errors }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa-solid fa-save me-1"></i> Guardar Editorial
+                        </button>
+                        <a href="{% url 'lista_libros' %}" class="btn btn-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
